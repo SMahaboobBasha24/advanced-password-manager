@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Advanced Password Manager</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.container{
+background:#1e293b;
+padding:30px;
+border-radius:10px;
+width:420px;
+}
+
+h2{
+text-align:center;
+}
+
+input{
+width:100%;
+padding:10px;
+margin-top:10px;
+border:none;
+border-radius:6px;
+}
+
+button{
+margin-top:10px;
+padding:10px;
+width:100%;
+border:none;
+background:#22c55e;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+.entry{
+background:#334155;
+padding:10px;
+margin-top:10px;
+border-radius:6px;
+}
+
+.actions span{
+margin-right:10px;
+cursor:pointer;
+}
+
+.pass{
+margin-top:5px;
+font-size:14px;
+color:#94a3b8;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>🔐 Password Manager</h2>
+
+<input id="search" placeholder="Search..." onkeyup="render()">
+
+<input id="site" placeholder="Website">
+<input id="user" placeholder="Username">
+<input id="pass" placeholder="Password">
+
+<button onclick="add()">Save</button>
+
+<div id="list"></div>
+
+</div>
+
+<script>
+
+let data = JSON.parse(localStorage.getItem("passwords")) || []
+
+function render(){
+
+let list = document.getElementById("list")
+list.innerHTML = ""
+
+let search = document.getElementById("search").value.toLowerCase()
+
+data
+.filter(d => d.site.toLowerCase().includes(search))
+.forEach((item,index)=>{
+
+let div = document.createElement("div")
+div.className = "entry"
+
+div.innerHTML = `
+<b>${item.site}</b> (${item.user})
+<div class="pass" id="p${index}">••••••</div>
+<div class="actions">
+<span onclick="toggle(${index})">👁️</span>
+<span onclick="remove(${index})">❌</span>
+</div>
+`
+
+list.appendChild(div)
+
+})
+
+localStorage.setItem("passwords", JSON.stringify(data))
+
+}
+
+function add(){
+
+let site = document.getElementById("site").value
+let user = document.getElementById("user").value
+let pass = document.getElementById("pass").value
+
+if(!site || !user || !pass) return
+
+data.push({site,user,pass})
+
+document.getElementById("site").value=""
+document.getElementById("user").value=""
+document.getElementById("pass").value=""
+
+render()
+
+}
+
+function remove(index){
+
+data.splice(index,1)
+render()
+
+}
+
+function toggle(index){
+
+let el = document.getElementById("p"+index)
+
+if(el.innerText === "••••••"){
+el.innerText = data[index].pass
+}else{
+el.innerText = "••••••"
+}
+
+}
+
+render()
+
+</script>
+
+</body>
+</html>
